@@ -1,32 +1,43 @@
-#include "list.h"
+#include "container.h"
 #include <stdlib.h>
 #include <stdio.h>
 
-typedef struct node_
+container* list_create()
 {
-	elem_t data;
-	struct node_* next;
-	struct node_* prev;
-} node;
+	container* cont = (container*) malloc(sizeof(container) + sizeof(list));
+	if(cont == NULL)
+	{
+		return NULL;
+	}
 
-typedef struct list_
-{
-	size_t size;
-	node* head;
-	node* tail;
-} list;
+	cont->methods = (container_m*) malloc(sizeof(container_m));
+	if(cont->methods == NULL)
+	{
+		free(cont);
+		return NULL;
+	}
 
-list* list_create()
-{
-	list* tmp = (list*) malloc(sizeof(list));
+	list* tmp = (list*)(cont + 1);
+
 	tmp->size = 0;
 	tmp->head = NULL;
 	tmp->tail = NULL;
-	return tmp;
+
+	cont->methods->insert = &list_insert;
+	cont->methods->delete = &list_delete;
+	cont->methods->get = &list_get;
+	cont->methods->size = &list_size;
+	cont->methods->print = &list_print;
+	cont->methods->swap = &list_swap;
+	cont->methods->head = &list_head;
+	cont->methods->tail = &list_tail;
+
+	return cont;
 }
 
-void list_destroy(list* p)
+void list_destroy(container* cont)
 {
+	list* p = (list*)(cont + 1);
 	node *tmp = p->head;
 	node *next = NULL;
 	while(tmp)
@@ -35,12 +46,13 @@ void list_destroy(list* p)
 		free(tmp);
 		tmp = next;
 	}
-	free(p);
-	p = NULL;
+	free(cont->methods);
+	free(cont);
 }
 
-int list_insert(list* p, elem_t data, size_t pos)
+int list_insert(container* cont, elem_t data, size_t pos)
 {
+	list* p = (list*)(cont + 1);
 	if(pos > p->size)
 	{
 		printf("bad position\n");
@@ -48,7 +60,7 @@ int list_insert(list* p, elem_t data, size_t pos)
 	}
 	
 	node* tmp = (node*) malloc(sizeof(node));
-        tmp->data = data;
+    tmp->data = data;
 	
 	if(p->size == 0)
 	{
@@ -84,8 +96,9 @@ int list_insert(list* p, elem_t data, size_t pos)
 	return 0;
 }
 
-int list_delete(list* p, size_t pos)
+int list_delete(container* cont, size_t pos)
 {
+	list* p = (list*)(cont + 1);
 	if(pos >= p->size)
 	{
 		printf("bad position\n");
@@ -134,8 +147,9 @@ int list_delete(list* p, size_t pos)
 	return 0;
 }
 
-elem_t list_get(list* p, size_t pos)
+elem_t list_get(container* cont, size_t pos)
 {
+	list* p = (list*)(cont + 1);
 	if(pos >= p->size)
 	{
 		printf("bad position\n");
@@ -151,8 +165,15 @@ elem_t list_get(list* p, size_t pos)
 	return cur->data;
 }
 
-void list_print(list* p)
+size_t list_size(container* cont)
 {
+	list* p = (list*)(cont + 1);
+	return p->size;
+}
+
+void list_print(container* cont)
+{
+	list* p = (list*)(cont + 1);
 	size_t sz = p->size;
 	node* cur = p->head;
 	for(size_t i = 0; i < sz; i++)
@@ -163,8 +184,9 @@ void list_print(list* p)
 	printf("size = %ld\n", p->size);
 }
 
-void list_swap(list* p, size_t first, size_t second)
+void list_swap(container* cont, size_t first, size_t second)
 {
+	list* p = (list*)(cont + 1);
 	if(first > p->size || second > p->size)
 	{
 		printf("bad position\n");
@@ -185,12 +207,14 @@ void list_swap(list* p, size_t first, size_t second)
 	n_second->data = tmp;
 }
 
-node* list_head(list* p)
+elem_t list_head(container* cont)
 {
-	return p->head;
+	list* p = (list*)(cont + 1);
+	return p->head->data;
 }
 
-node* list_tail(list* p)
+elem_t list_tail(container* cont)
 {
-	return p->tail;
+	list* p = (list*)(cont + 1);
+	return p->tail->data;
 }

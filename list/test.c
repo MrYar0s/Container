@@ -1,17 +1,17 @@
-#include "list.h"
+#include "container.h"
 #include <stdlib.h>
 #include <time.h>
 
-static const size_t sz = 10;
+static const size_t sz = 1000;
 
-void sort(list* cont)
+void sort(container* cont)
 {
 	for(size_t i = 0; i < sz; i++)
 	{
 		for(size_t j = 0; j < sz-1; j++)
 		{
-			elem_t first = list_find(cont, j);
-			elem_t second = list_find(cont, j+1);
+			elem_t first = list_get(cont, j);
+			elem_t second = list_get(cont, j+1);
 			if(first > second)
 			{
 				list_swap(cont, j, j+1);
@@ -23,8 +23,8 @@ void sort(list* cont)
 int main()
 {
 	srand(time(NULL));
-	list* cont = list_create();
-	
+	container* cont = list_create();
+
 	for(size_t i = 0; i < sz; i++)
 	{
 		list_insert(cont, rand(), i);
