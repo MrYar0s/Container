@@ -31,6 +31,7 @@ container* list_create()
 	cont->methods->swap = &list_swap;
 	cont->methods->head = &list_head;
 	cont->methods->tail = &list_tail;
+	cont->methods->destroy = &list_destroy;
 
 	return cont;
 }
