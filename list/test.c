@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-static const size_t sz = 1000;
+static const size_t sz = 1e6;
 
 void sort(container* cont)
 {
@@ -10,11 +10,11 @@ void sort(container* cont)
 	{
 		for(size_t j = 0; j < sz-1; j++)
 		{
-			elem_t first = list_get(cont, j);
-			elem_t second = list_get(cont, j+1);
+			elem_t first = cont->methods->get(cont, j);
+			elem_t second = cont->methods->get(cont, j+1);
 			if(first > second)
 			{
-				list_swap(cont, j, j+1);
+				cont->methods->swap(cont, j, j+1);
 			}
 		}
 	}
@@ -31,8 +31,8 @@ int main()
 	}
 
 	sort(cont);
-	list_print(cont);
-	list_destroy(cont);
+	cont->methods->print(cont);
+	cont->methods->destroy(cont);
 
 	return 0;
 }
